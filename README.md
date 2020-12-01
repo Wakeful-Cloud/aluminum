@@ -8,7 +8,7 @@ Use non-Steam games with Steam without compromise.
 2. Download and build Aluminum: `go get github.com/wakeful-cloud/aluminum`
 3. **Build mock game**:
 ```powershell
-cd $env:GOPATH/src/github.com/wakeful-cloud/aluminum/mock && go build
+cd $env:GOPATH/src/github.com/wakeful-cloud/aluminum/mock; go build
 ```
 
 ## Uninstall
