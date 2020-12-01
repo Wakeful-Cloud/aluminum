@@ -1,5 +1,5 @@
 # Aluminum
-![Status Shield](https://img.shields.io/badge/status-beta-yellow?style=for-the-badge)
+![Status Shield](https://img.shields.io/badge/status-release-brightgreen?style=for-the-badge)
 
 Use non-Steam games with Steam without compromise.
 
@@ -16,7 +16,6 @@ cd $env:GOPATH/src/github.com/wakeful-cloud/aluminum/mock; go build
 2. Nuke the database: `aluminum nuke`
 3. Remove the Go package:
 ```powershell
-rm $env:GOPATH/src/github.com/wakeful-cloud/aluminum -r
 rm $env:GOPATH/src/github.com/wakeful-cloud/aluminum -r
 ```
 4. No restart is necessary 😎
