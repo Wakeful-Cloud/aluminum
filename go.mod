@@ -1,14 +1,10 @@
 module github.com/wakeful-cloud/aluminum
 
-go 1.15
+go 1.16
 
 require (
 	github.com/StackExchange/wmi v0.0.0-20190523213315-cbe66965904d // indirect
-	github.com/briandowns/spinner v1.11.1
-	github.com/c-bata/go-prompt v0.2.5
-	github.com/fatih/color v1.10.0 // indirect
 	github.com/go-ole/go-ole v1.2.4 // indirect
-	github.com/mattn/go-colorable v0.1.8 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/prologic/bitcask v0.3.9
 	github.com/shirou/gopsutil v3.20.10+incompatible

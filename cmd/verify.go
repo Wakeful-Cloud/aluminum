@@ -3,7 +3,6 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -34,6 +33,9 @@ mock games correctly installed. If a mock game is missing, Aluminum will recreat
 		if err == nil {
 			//Iterate over games
 			err := db.Fold(func(rawName []byte) error {
+				//Wether or not the game was OK
+				ok := true
+
 				//Get raw target
 				rawTarget, err := db.Get(rawName)
 
@@ -53,21 +55,28 @@ mock games correctly installed. If a mock game is missing, Aluminum will recreat
 				newTarget := filepath.Join(dir, fmt.Sprintf("%sAluminum%s", name, extension))
 
 				//Verify mock game exists
-				_, err = os.Stat(target)
+				_, err = os.Stat(newTarget)
 
 				if err != nil && os.IsNotExist(err) {
+					ok = false
+
+					fmt.Printf("Game at %s is missing\n", target)
+
 					if !dry {
 						//Rename
 						err = os.Rename(target, newTarget)
+
 						//Link to mock game
 						err = os.Link(mock, target)
 
 						if err != nil {
 							panic(err)
 						}
+
+						fmt.Printf("Fixed game at %s\n", target)
 					}
 				} else if err != nil {
-					return fmt.Errorf("unknown mock game file %s state %s", target, err)
+					return fmt.Errorf("Unknown game %s state %s", target, err)
 				}
 
 				//Verify config file exists
@@ -75,6 +84,10 @@ mock games correctly installed. If a mock game is missing, Aluminum will recreat
 				_, err = os.Stat(configTarget)
 
 				if err != nil && os.IsNotExist(err) {
+					ok = false
+
+					fmt.Printf("Config file at %s is missing\n", configTarget)
+
 					if !dry {
 						//Marshal
 						bytes, err := json.Marshal(game{
@@ -90,14 +103,16 @@ mock games correctly installed. If a mock game is missing, Aluminum will recreat
 						configTarget := filepath.Join(dir, "aluminum-config.json")
 
 						//Write
-						err = ioutil.WriteFile(configTarget, bytes, 0644)
+						err = os.WriteFile(configTarget, bytes, 0644)
 
 						if err != nil {
 							panic(err)
 						}
+
+						fmt.Printf("Fixed config file at %s\n", configTarget)
 					}
 				} else if err != nil {
-					return fmt.Errorf("unknown config file %s state %s", configTarget, err)
+					return fmt.Errorf("Unknown config file %s state %s", configTarget, err)
 				}
 
 				//Check if game is in Steam
@@ -109,22 +124,34 @@ mock games correctly installed. If a mock game is missing, Aluminum will recreat
 
 				//If the game isn't registered with Steam, add it
 				if !hasGame {
-					//Stop steam
-					err = steam.Stop()
+					ok = false
 
-					if err != nil {
-						panic(err)
-					}
+					fmt.Printf("Steam entry for %s is missing\n", newTarget)
 
-					//Add the game to Steam
-					err = steam.AddGame(fmt.Sprintf("%s (Aluminum)", name), newTarget)
+					if !dry {
+						//Stop steam
+						err = steam.Stop()
 
-					if err != nil {
-						panic(err)
+						if err != nil {
+							panic(err)
+						}
+
+						//Add the game to Steam
+						err = steam.AddGame(fmt.Sprintf("%s (Aluminum)", name), newTarget)
+
+						if err != nil {
+							panic(err)
+						}
+
+						fmt.Printf("Added Steam entry for %s\n", newTarget)
 					}
 				}
 
-				fmt.Printf("Verified %s (At %s)\n", name, target)
+				if ok {
+					fmt.Printf("Verified %s (At %s) - found no problems\n", name, target)
+				} else {
+					fmt.Printf("Verified %s (At %s) - found problems \n", name, target)
+				}
 
 				return nil
 			})
@@ -133,10 +160,10 @@ mock games correctly installed. If a mock game is missing, Aluminum will recreat
 				panic(err)
 			}
 		} else if os.IsNotExist(err) {
-			fmt.Printf("You need to build the mock game first! (See the installations instructions!)")
+			fmt.Println("You need to build the mock game first! (See the installations instructions!)")
 			os.Exit(1)
 		} else {
-			fmt.Printf("Unknown mock game file %s state %s", mock, err)
+			fmt.Printf("Unknown mock game file %s state %s\n", mock, err)
 			os.Exit(1)
 		}
 	},
@@ -145,5 +172,5 @@ mock games correctly installed. If a mock game is missing, Aluminum will recreat
 func init() {
 	rootCmd.AddCommand(verifyCmd)
 
-	verifyCmd.Flags().BoolVar(&dry, "dry", false, "Dry run (Only lists corrupted mock games but doesn't fix them)")
+	verifyCmd.Flags().BoolVar(&dry, "dry", false, "Dry run (Only lists missing mock games but doesn't fix them)")
 }

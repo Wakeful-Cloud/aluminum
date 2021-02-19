@@ -1,4 +1,5 @@
 # Aluminum
+![Go Version 1.16](https://img.shields.io/badge/Go-1.16-007d9c?style=for-the-badge)
 ![Status Shield](https://img.shields.io/badge/status-release-brightgreen?style=for-the-badge)
 
 Use non-Steam games with Steam without compromise.

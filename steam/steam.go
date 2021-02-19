@@ -3,7 +3,6 @@ package steam
 import (
 	"fmt"
 	"hash/crc32"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -91,7 +90,7 @@ func CheckGame(name string, target string) (bool, error) {
 	userdata := filepath.Join(os.Getenv("ProgramFiles(x86)"), "Steam", "userdata")
 
 	//Get all userdata subdirectories
-	subdirectories, err := ioutil.ReadDir(userdata)
+	subdirectories, err := os.ReadDir(userdata)
 
 	if err != nil {
 		return false, err
@@ -101,7 +100,7 @@ func CheckGame(name string, target string) (bool, error) {
 	shortcutPath := filepath.Join(userdata, subdirectories[0].Name(), "config", "shortcuts.vdf")
 
 	//Read the shortcuts
-	bytes, err := ioutil.ReadFile(shortcutPath)
+	bytes, err := os.ReadFile(shortcutPath)
 
 	if err != nil {
 		return false, err
@@ -193,7 +192,7 @@ func Update(updater func(*vdf.Map) error) error {
 	userdata := filepath.Join(os.Getenv("ProgramFiles(x86)"), "Steam", "userdata")
 
 	//Get all userdata subdirectories
-	subdirectories, err := ioutil.ReadDir(userdata)
+	subdirectories, err := os.ReadDir(userdata)
 
 	if err != nil {
 		return err
@@ -203,7 +202,7 @@ func Update(updater func(*vdf.Map) error) error {
 	shortcutPath := filepath.Join(userdata, subdirectories[0].Name(), "config", "shortcuts.vdf")
 
 	//Read the shortcuts
-	bytes, err := ioutil.ReadFile(shortcutPath)
+	bytes, err := os.ReadFile(shortcutPath)
 
 	if err != nil {
 		return err
@@ -231,7 +230,7 @@ func Update(updater func(*vdf.Map) error) error {
 	}
 
 	//Save new VDF
-	err = ioutil.WriteFile(shortcutPath, bytes, 0644)
+	err = os.WriteFile(shortcutPath, bytes, 0644)
 
 	if err != nil {
 		return err

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -72,6 +71,7 @@ command to undo anything done by running this command in the first place.`,
 			if err != nil {
 				panic(err)
 			}
+
 			//Link to mock game
 			err = os.Link(mock, target)
 
@@ -96,7 +96,7 @@ command to undo anything done by running this command in the first place.`,
 			configPath := filepath.Join(dir, "aluminum-config.json")
 
 			//Write
-			err = ioutil.WriteFile(configPath, bytes, 0644)
+			err = os.WriteFile(configPath, bytes, 0644)
 
 			if err != nil {
 				panic(err)
@@ -118,10 +118,10 @@ command to undo anything done by running this command in the first place.`,
 
 			fmt.Printf("Added game %s (At %s)\n", name, target)
 		} else if os.IsNotExist(err) {
-			fmt.Printf("You need to build the mock game first! (See the installations instructions!)")
+			fmt.Print("You need to build the mock game first! (See the installations instructions!)\n")
 			os.Exit(1)
 		} else {
-			fmt.Printf("Unknown mock game file %s state %s", target, err)
+			fmt.Printf("Unknown mock game file %s state %s\n", target, err)
 			os.Exit(1)
 		}
 	},
